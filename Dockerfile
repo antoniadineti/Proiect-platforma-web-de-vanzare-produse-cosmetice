@@ -1,9 +1,10 @@
-FROM maven as build
-COPY src /home/app/src
-COPY pom.xml /home/app
-RUN mvn -f /home/app/pom.xml clean package
+FROM mysql
 
-FROM openjdk:17-jdk
-COPY --from=build /home/app/target/nyxdata-0.0.1-SNAPSHOT.jar /app.jar
-EXPOSE 7000
-ENTRYPOINT ["java", "-jar", "/app.jar"]
+ENV MYSQL_ROOT_PASSWORD = ${MYSQL_ROOT_PASSWORD}
+ENV MYSQL_DATABASE = ${MYSQL_DATABASE}
+ENV MYSQL_USER = ${MYSQL_USER}
+ENV MYSQL_PASSWORD = ${MYSQL_PASSWORD}
+
+COPY ./src/main/resources/data.sql /docker-entrypoint-initdb.d/init.sql
+
+EXPOSE 3306
